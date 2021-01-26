@@ -1,2 +1,3 @@
-# dilerous.powerprotect
-Ansible module for PowerProtect
+# Ansible Collection - dilerous.powerprotect
+
+Documentation for the collection.
