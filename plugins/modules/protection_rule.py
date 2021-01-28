@@ -82,7 +82,7 @@ def run_module():
         label=dict(type='str', required=True),
         priority=dict(type='str', required=False),
         server=dict(type='str', required=False),
-        password=dict(type='str', required=False)
+        password=dict(type='str', required=False, no_log=True)
     )
 
     # seed the result dict in the object

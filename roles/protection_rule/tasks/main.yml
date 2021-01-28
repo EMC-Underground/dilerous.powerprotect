@@ -1,0 +1,10 @@
+---
+# tasks file for protection_rule
+- name: run the new module
+  dilerous.powerprotect.protection_rule:
+    server: "{{ inventory_hostname }}"
+    password: "{{ password }}"
+    name: 'newprotrule'
+    policy_name: 'hourly'
+    inventory_type: 'KUBERNETES'
+    label: 'backup=foreverly'
