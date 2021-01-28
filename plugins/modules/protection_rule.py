@@ -77,14 +77,12 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
         name=dict(type='str', required=True),
-        rule_name=dict(type='str', required=True),
         policy_name=dict(type='str', required=True),
         inventory_type=dict(type='str', required=True),
         label=dict(type='str', required=True),
         priority=dict(type='str', required=False),
         server=dict(type='str', required=False),
-        password=dict(type='str', required=False),
-        new=dict(type='bool', required=False, default=False)
+        password=dict(type='str', required=False)
     )
 
     # seed the result dict in the object
@@ -117,20 +115,39 @@ def run_module():
     # part where your module will do what it needs to do)
     ppdm = powerprotect.Ppdm(server=module.params['server'],
                              password=module.params['password'])
-    protection_policies = ppdm.get_protection_policies()
-    create_protection_rule = ppdm.create_protection_rule(
+    prot_rules = ppdm.get_protection_rules()['content']
+    exists = False
+    for item in prot_rules:
+        if item['name'] == module.params['name']:
+            exists = True
+
+    if not exists:
+        ansible_body = ppdm.create_protection_rule(
                               policy_name=module.params['policy_name'],
-                              rule_name=module.params['rule_name'],
+                              rule_name=module.params['name'],
                               inventory_type=module.params['inventory_type'],
                               label=module.params['label'])
+        result['changed'] = True
+    else:
+        prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
+        ansible_body = {'actionResult': prot_policy_by_name['content'][0]['id'],
+                                'name': module.params['name'],
+                                'inventorySourceType': module.params['inventory_type'],
+                        'conditions': [{'assetAttributeName': 'userTags',
+                                        'operator': 'EQUALS',
+                                        'assetAttributeValue': module.params['label']}]
+                                       }
+        if not ppdm.compare_protection_rule(module.params['name'], ansible_body):
+            server_body = ppdm.get_protection_rule_by_name(module.params['name'])
+            server_body.update(ansible_body)
+            ppdm.update_protection_rule(server_body)
+            result['changed'] = True
 
-    result['original_message'] = ppdm.headers
+    result['original_message'] = ansible_body
     result['message'] = 'goodbye'
 
     # use whatever logic you need to determine whether or not this module
     # made any modifications to your target
-    if module.params['new']:
-        result['changed'] = True
 
     # during the execution of the module, if there is an exception or a
     # conditional state that effectively causes a failure, run

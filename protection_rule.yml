@@ -1,19 +1,18 @@
-- name: test my new module
+- name: Create Protection Rules
   hosts: localhost
   vars_files:
-    - ./vars.yml
+  - ./vars.yml
   tasks:
   - name: run the new module
     protection_rule:
-      server: "{{ groups['ppdm'][0] }}"
-      password: "{{ password }}"
-      name: 'hello'
-      new: true
-      rule_name: 'test'
+
+      rule_name: 'newprotrule'
       policy_name: 'hourly'
       inventory_type: 'KUBERNETES'
-      label: 'backup=hourly'
-    register: testout
-  - name: dump test output
-    debug:
-      msg: '{{ testout }}'
+      label: 'backup=foreverly'
+  - name: run the new 2nd module
+    protection_rule:
+      rule_name: '2ndnewprotrule'
+      policy_name: 'hourly'
+      inventory_type: 'KUBERNETES'
+      label: 'backup=thirdlsyadfsjkl'

@@ -1,2 +1,11 @@
 ---
-password: 'Password#1'
+protection_rules:
+- name: hourly
+  policy_name: 'hourly'
+  inventory_type: 'KUBERNETES'
+  label: 'backup=hi'
+- name: daily
+  policy_name: 'hourly'
+  inventory_type: 'KUBERNETES'
+  label: 'backup=hello'
+
