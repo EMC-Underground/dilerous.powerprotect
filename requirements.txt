@@ -1,1 +1,1 @@
-powerprotect>=0.1.0
+powerprotect=0.1.19
