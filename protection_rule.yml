@@ -1,0 +1,15 @@
+- name: test my new module
+  hosts: localhost
+  tasks:
+  - name: run the new module
+    protection_rule:
+      name: 'hello'
+      new: true
+      rule_name: 'test'
+      protection_policy_name: 'hourly'
+      inventory_type: 'KUBERNETES'
+      label: 'backup=hourly'
+    register: testout
+  - name: dump test output
+    debug:
+      msg: '{{ testout }}'
