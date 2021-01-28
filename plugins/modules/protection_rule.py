@@ -70,6 +70,7 @@ message:
 '''
 
 from ansible.module_utils.basic import AnsibleModule
+import powerprotect
 
 
 def run_module():
@@ -77,9 +78,12 @@ def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
         rule_name=dict(type='str', required=True),
-        protection_policy_name=dict(type='str', required=True),
+        policy_name=dict(type='str', required=True),
         inventory_type=dict(type='str', required=True),
         label=dict(type='str', required=True),
+        priority=dict(type='str', required=False),
+        server=dict(type='str', required=False),
+        password=dict(type='str', required=False),
         new=dict(type='bool', required=False, default=False)
     )
 
@@ -111,7 +115,16 @@ def run_module():
 
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
-    result['original_message'] = module.params['inventory_type']
+    ppdm = powerprotect.Ppdm(server=module.params['server'],
+                             password=module.params['password'])
+    protection_policies = ppdm.get_protection_policies()
+    create_protection_rule = ppdm.create_protection_rule(
+                              policy_name=module.params['policy_name'],
+                              rule_name=module.params['rule_name'],
+                              inventory_type=module.params['inventory_type'],
+                              label=module.params['label'])
+
+    result['original_message'] = ppdm.headers
     result['message'] = 'goodbye'
 
     # use whatever logic you need to determine whether or not this module

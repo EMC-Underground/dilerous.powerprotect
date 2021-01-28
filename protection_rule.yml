@@ -1,8 +1,12 @@
 - name: test my new module
   hosts: localhost
+  vars_files:
+    - ./vars.yml
   tasks:
   - name: run the new module
     protection_rule:
+      server: "{{ groups['ppdm'][0] }}"
+      password: "{{ password }}"
       name: 'hello'
       new: true
       rule_name: 'test'
