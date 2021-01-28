@@ -10,7 +10,7 @@
       name: 'hello'
       new: true
       rule_name: 'test'
-      protection_policy_name: 'hourly'
+      policy_name: 'hourly'
       inventory_type: 'KUBERNETES'
       label: 'backup=hourly'
     register: testout
