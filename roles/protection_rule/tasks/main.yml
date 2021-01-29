@@ -6,6 +6,6 @@
     password: "{{ password }}"
     name: "{{ item.name }}"
     policy_name: "{{ item.policy_name }}"
-    inventory_type: "{{ item.inventory_type | default(KUBERNETES) }} "
+    inventory_type: "{{ item.inventory_type | default('KUBERNETES') }}"
     label: "{{ item.label }}"
   loop: "{{ protection_rules }}"
