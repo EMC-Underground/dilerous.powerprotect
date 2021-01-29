@@ -1,1 +1,1 @@
-powerprotect==0.1.24
+powerprotect==0.1.25
