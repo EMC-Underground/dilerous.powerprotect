@@ -78,10 +78,10 @@ def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
         policy_name=dict(type='str', required=True),
-        inventory_type=dict(type='str', required=True),
+        inventory_type=dict(default='KUBERNETES', choices=['KUBERNETES', 'VMWARE_VIRTUAL_MACHINE']),
         label=dict(type='str', required=True),
-        priority=dict(type='str', required=False),
-        server=dict(type='str', required=False),
+        priority=dict(type='str'),
+        server=dict(type='str'),
         password=dict(type='str', required=False, no_log=True)
     )
 
