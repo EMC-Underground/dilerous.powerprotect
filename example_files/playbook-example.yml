@@ -1,6 +1,0 @@
----
-- hosts: prod.chd
-  vars_files:
-  - ./vars/vars.yml
-  roles:
-  - dilerous.protection_rule
