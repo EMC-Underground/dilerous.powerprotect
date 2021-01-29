@@ -77,12 +77,14 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
         name=dict(type='str', required=True),
-        policy_name=dict(type='str', required=True),
+        policy_name=dict(type='str'),
         inventory_type=dict(default='KUBERNETES', choices=['KUBERNETES', 'VMWARE_VIRTUAL_MACHINE']),
-        label=dict(type='str', required=True),
+        label=dict(type='str'),
         priority=dict(type='str'),
         server=dict(type='str'),
-        password=dict(type='str', required=False, no_log=True)
+        password=dict(type='str', no_log=True),
+        token=dict(type='str'),
+        state=dict(default='present', choices=['present', 'absent'])
     )
 
     # seed the result dict in the object
@@ -122,14 +124,14 @@ def run_module():
         if item['name'] == module.params['name']:
             exists = True
 
-    if not exists:
+    if not exists and module.params['state'] == 'present':
         ansible_body = ppdm.create_protection_rule(
                               policy_name=module.params['policy_name'],
                               rule_name=module.params['name'],
                               inventory_type=module.params['inventory_type'],
                               label=module.params['label'])
         result['changed'] = True
-    else:
+    elif exists and module.params['state'] == 'present':
         prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
         ansible_body = {'actionResult': prot_policy_by_name['content'][0]['id'],
                                 'name': module.params['name'],
@@ -143,8 +145,11 @@ def run_module():
             server_body.update(ansible_body)
             ppdm.update_protection_rule(server_body)
             result['changed'] = True
-
-    result['original_message'] = ansible_body
+    if exists and module.params['state'] == 'absent':
+        prid = ppdm.get_protection_rule_by_name(module.params['name'])['id']
+        ansible_body = ppdm.delete_protection_rule(prid)
+        result['changed'] = True
+    #result['original_message'] = ansible_body
     result['message'] = 'goodbye'
 
     # use whatever logic you need to determine whether or not this module

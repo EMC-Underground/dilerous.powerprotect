@@ -2,10 +2,12 @@
 # tasks file for protection_rule
 - name: run the new module
   dilerous.powerprotect.protection_rule:
-    server: "{{ inventory_hostname }}"
-    password: "{{ password }}"
+    server: "{{ inventory_hostname | default('') }}"
+    password: "{{ password | default('') }}"
     name: "{{ item.name }}"
-    policy_name: "{{ item.policy_name }}"
+    policy_name: "{{ item.policy_name | default('') }}"
     inventory_type: "{{ item.inventory_type | default('KUBERNETES') }}"
-    label: "{{ item.label }}"
+    label: "{{ item.label | default('') }}"
+    state: "{{ item.state | default('present') }}"
+    token: "{{ item.token | default('') }}"
   loop: "{{ protection_rules }}"

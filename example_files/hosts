@@ -7,7 +7,7 @@ nonprodchd
 10.237.198.35
 
 [prodiad]
-10.237.198.36
+ppdm.bluehairfreak.com
 
 [nonprodchd]
 10.237.198.37
@@ -18,4 +18,4 @@ ansible_connection=local
 username=admin
 password=Password#1
 
-ansible_python_interpreter=auto_silent
+ansible_python_interpreter=/Library/Frameworks/Python.framework/Versions/3.8/bin/python3

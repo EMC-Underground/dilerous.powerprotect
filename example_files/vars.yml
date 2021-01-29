@@ -4,6 +4,7 @@ protection_rules:
   policy_name: 'daily'
   inventory_type: 'KUBERNETES'
   label: 'backup=aaron'
+  state: 'absent'
 - name: 'rule2'
-  policy_name: 'hourly'
+  policy_name: 'test'
   label: 'backup=hourly'
