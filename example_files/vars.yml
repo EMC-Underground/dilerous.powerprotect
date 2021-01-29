@@ -1,0 +1,9 @@
+---
+protection_rules:
+- name: 'rule1'
+  policy_name: 'daily'
+  inventory_type: 'KUBERNETES'
+  label: 'backup=aaron'
+- name: 'rule2'
+  policy_name: 'hourly'
+  label: 'backup=hourly'
