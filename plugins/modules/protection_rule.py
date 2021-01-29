@@ -115,6 +115,7 @@ def run_module():
     # part where your module will do what it needs to do)
     ppdm = powerprotect.Ppdm(server=module.params['server'],
                              password=module.params['password'])
+    ppdm.login()
     prot_rules = ppdm.get_protection_rules()['content']
     exists = False
     for item in prot_rules:
