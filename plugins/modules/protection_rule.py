@@ -118,11 +118,12 @@ def run_module():
     ppdm = powerprotect.Ppdm(server=module.params['server'],
                              password=module.params['password'])
     ppdm.login()
-    prot_rules = ppdm.get_protection_rules()['content']
+    prot_rules = ppdm.get_protection_rule_by_name(module.params['name'])
+#    if prot_rules.success is False:
+#        module.exit_json(msg='Get protection rules failed', **result)
     exists = False
-    for item in prot_rules:
-        if item['name'] == module.params['name']:
-            exists = True
+    if bool(prot_rules.response) is True:
+        exists = True
 
     if not exists and module.params['state'] == 'present':
         ansible_body = ppdm.create_protection_rule(
@@ -133,7 +134,9 @@ def run_module():
         result['changed'] = True
     elif exists and module.params['state'] == 'present':
         prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
-        ansible_body = {'actionResult': prot_policy_by_name['content'][0]['id'],
+        if bool(prot_policy_by_name.response) is False:
+            module.fail_json(msg=f"Invalid protection policy name: {module.params['policy_name']}")
+        ansible_body = {'actionResult': prot_policy_by_name.response['id'],
                                 'name': module.params['name'],
                                 'inventorySourceType': module.params['inventory_type'],
                         'conditions': [{'assetAttributeName': 'userTags',
