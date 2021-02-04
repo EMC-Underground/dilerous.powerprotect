@@ -6,7 +6,7 @@ protection_rules:
   label: 'backup=aaron'
   state: 'present'
 - name: 'rule2'
-  policy_name: 'test'
+  policy_name: 'hourly'
   inventory_type: 'KUBERNETES'
   label: 'backup=test'
   state: 'present'

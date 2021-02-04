@@ -119,11 +119,20 @@ def run_module():
                              password=module.params['password'])
     ppdm.login()
     prot_rules = ppdm.get_protection_rule_by_name(module.params['name'])
-#    if prot_rules.success is False:
-#        module.exit_json(msg='Get protection rules failed', **result)
+    if prot_rules.success is False:
+        module.fail_json(msg='Get protection rules failed', **result)
     exists = False
     if bool(prot_rules.response) is True:
         exists = True
+    if exists and module.params['state'] == 'absent':
+        prid = ppdm.get_protection_rule_by_name(module.params['name'])['id']
+        ansible_body = ppdm.delete_protection_rule(prid)
+        result['changed'] = True
+        result['message'] = f"Protection Rule {module.params['name']} has been deleted"
+        module.exit_json(**result)
+    prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
+    if bool(prot_policy_by_name.response) is False:
+        module.fail_json(msg=f"Invalid protection policy name: {module.params['policy_name']}")
 
     if not exists and module.params['state'] == 'present':
         ansible_body = ppdm.create_protection_rule(
@@ -145,13 +154,9 @@ def run_module():
                                        }
         if not ppdm.compare_protection_rule(module.params['name'], ansible_body):
             server_body = ppdm.get_protection_rule_by_name(module.params['name'])
-            server_body.update(ansible_body)
+            server_body.response.update(ansible_body)
             ppdm.update_protection_rule(server_body)
             result['changed'] = True
-    if exists and module.params['state'] == 'absent':
-        prid = ppdm.get_protection_rule_by_name(module.params['name'])['id']
-        ansible_body = ppdm.delete_protection_rule(prid)
-        result['changed'] = True
     #result['original_message'] = ansible_body
     result['message'] = 'goodbye'
 
