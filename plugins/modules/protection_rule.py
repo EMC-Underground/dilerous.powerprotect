@@ -105,7 +105,7 @@ def run_module():
     ppdm.login()
     protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
                                                   ppdm=ppdm,
-                                                  check_mode=module.params['check_mode'])
+                                                  check_mode=module.check_mode)
     if module.params['state'] == 'absent':
         protection_rule.delete_rule()
     if module.params['state'] == 'present':
