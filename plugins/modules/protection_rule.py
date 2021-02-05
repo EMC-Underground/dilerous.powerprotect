@@ -74,53 +74,38 @@ import powerprotect
 
 
 def run_module():
-    # define available arguments/parameters a user can pass to the module
     module_args = dict(
         name=dict(type='str', required=True),
         policy_name=dict(type='str'),
         inventory_type=dict(default='KUBERNETES', choices=['KUBERNETES', 'VMWARE_VIRTUAL_MACHINE']),
         label=dict(type='str'),
         priority=dict(type='str'),
-        server=dict(type='str'),
-        password=dict(type='str', no_log=True),
+        server=dict(type='str', required=True),
+        password=dict(type='str', no_log=True, required=True),
+        username=dict(type='str', default='admin'),
         token=dict(type='str'),
         state=dict(default='present', choices=['present', 'absent'])
     )
 
-    # seed the result dict in the object
-    # we primarily care about changed and state
-    # changed is if this module effectively modified the target
-    # state will include any data that you want your module to pass back
-    # for consumption, for example, in a subsequent task
     result = dict(
         changed=False,
         original_message='',
-        message=''
+        message='',
+        protection_rule=''
     )
 
-    # the AnsibleModule object will be our abstraction working with Ansible
-    # this includes instantiation, a couple of common attr would be the
-    # args/params passed to the execution, as well as if the module
-    # supports check mode
     module = AnsibleModule(
         argument_spec=module_args,
         supports_check_mode=True
     )
 
-    # if the user is working with this module in only check mode we do not
-    # want to make any changes to the environment, just return the current
-    # state with no modifications
-    if module.check_mode:
-        module.exit_json(**result)
-
-    if module.params['name'] == 'fail me':
-        module.fail_json(msg='You requested this to fail', **result)
-    # manipulate or modify the state as needed (this is going to be the
-    # part where your module will do what it needs to do)
     ppdm = powerprotect.Ppdm(server=module.params['server'],
-                             password=module.params['password'])
+                             password=module.params['password'],
+                             username=module.params['username'])
     ppdm.login()
-    protection_rule = powerprotect.ProtectionRule(name=module.params['name'], ppdm=ppdm)
+    protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
+                                                  ppdm=ppdm,
+                                                  check_mode=module.params['check_mode'])
     if module.params['state'] == 'absent':
         protection_rule.delete_rule()
     if module.params['state'] == 'present':
@@ -139,6 +124,7 @@ def run_module():
         protection_rule.update_rule()
         protection_rule.create_rule(**module.params)
     result['changed'] = protection_rule.changed
+    result['protection_rule'] = protection_rule.body
     if protection_rule.failure is True:
         module.fail_json(msg=protection_rule.fail_msg, **result)
     result['message'] = protection_rule.msg
