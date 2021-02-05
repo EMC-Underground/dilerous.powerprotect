@@ -5,13 +5,16 @@ protection_rules:
   inventory_type: 'KUBERNETES'
   label: 'test=test'
   state: 'present'
+  check_mode: true
 - name: 'rule2'
-  policy_name: 'hourly'
+  policy_name: 'daily'
   inventory_type: 'KUBERNETES'
-  label: 'backup=test'
+  label: 'backup=testtt'
   state: 'present'
+  check_mode: true
 - name: 'Denise'
   policy_name: 'daily'
   inventory_type: 'KUBERNETES'
   label: 'backup=denise'
   state: absent
+  check_mode: true

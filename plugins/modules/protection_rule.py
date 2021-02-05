@@ -106,6 +106,7 @@ def run_module():
     protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
                                                   ppdm=ppdm,
                                                   check_mode=module.check_mode)
+    print(protection_rule.__dict__)
     if module.params['state'] == 'absent':
         protection_rule.delete_rule()
     if module.params['state'] == 'present':
