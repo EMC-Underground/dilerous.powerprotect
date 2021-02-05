@@ -18,4 +18,4 @@ ansible_connection=local
 username=admin
 password=Password#1
 
-ansible_python_interpreter=auto_silent
+ansible_python_interpreter=/Library/Frameworks/Python.framework/Versions/3.8/bin/python3

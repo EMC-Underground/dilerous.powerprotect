@@ -3,7 +3,7 @@ protection_rules:
 - name: 'rule1'
   policy_name: 'daily'
   inventory_type: 'KUBERNETES'
-  label: 'backup=aaron'
+  label: 'test=test'
   state: 'present'
 - name: 'rule2'
   policy_name: 'hourly'
@@ -14,4 +14,4 @@ protection_rules:
   policy_name: 'daily'
   inventory_type: 'KUBERNETES'
   label: 'backup=denise'
-  state: 'present'
+  state: absent

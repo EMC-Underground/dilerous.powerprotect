@@ -73,82 +73,6 @@ from ansible.module_utils.basic import AnsibleModule
 import powerprotect
 
 
-class ProtectionPolicy:
-
-    def __init__(self, **kwargs):
-        self.exists = False
-        self.deleted = False
-        self.created = False
-        self.updated = False
-        self.changed = False
-        self.check_mode = kwargs.get('check_mode', False)
-        self.msg = ""
-        self.failure = False
-        self.fail_msg = ""
-        self.name = kwargs['name']
-        self.body = {}
-        self.target_body = {}
-        self.url = ""
-        self.ppdm = kwargs['ppdm']
-        self.get_rule()
-
-    def get_rule(self):
-        protection_rule = self.ppdm.get_protection_rule_by_name(self.name)
-        if bool(protection_rule.response) is not False:
-            self.exists = True
-            self.body = protection_rule.response
-
-    def delete_rule(self):
-        if self.exists:
-            return_value = self.ppdm.delete_protection_rule(self.body['id'])
-            if return_value.success:
-                self.changed = True
-                self.deleted = True
-                self.body = {}
-                self.exists = False
-                self.msg = f"Protection rule {self.name} deleted"
-            elif return_value.success is False:
-                self.failure = True
-                self.fail_msg = return_value.fail_msg
-
-    def create_rule(self, **kwargs):
-        policy_name = kwargs['policy_name']
-        intentory_type = kwargs['intentory_type']
-        label = kwargs['label']
-        if not self.exists:
-            return_value = ppdm.create_protection_rule(rule_name=self.name,
-                                                       policy_name=policy_name,
-                                                       inventory_type=inventory_type,
-                                                       label=label)
-            if return_value.success:
-                self.changed = True
-                self.get_rule()
-                self.created = True
-                self.msg = f"Protection Rule {self.name} created"
-            elif return_value.success is False:
-                self.failure = True
-                self.fail_msg = return_value.fail_msg
-
-    def update_rule(self, **kwargs):
-        policy_name = kwargs['policy_name']
-        intentory_type = kwargs['intentory_type']
-        label = kwargs['label']
-        if (self.exists and
-            self.ppdm.protection_rules_match(self.name, self.target_body) is False):
-            self.body.update(self.target_body)
-            return_value = ppdm.update_protection_rule(self.body)
-            if return_value.success:
-                self.changed = True
-                self.get_rule()
-                self.created = True
-                self.msg = f"Protection Rule {self.name} updated"
-            elif return_value.success is False:
-                self.failure = True
-                self.fail_msg = return_value.fail_msg
-
-
-
-
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
@@ -196,11 +120,14 @@ def run_module():
     ppdm = powerprotect.Ppdm(server=module.params['server'],
                              password=module.params['password'])
     ppdm.login()
-    protection_rule = ProtectionPolicy(name=module.params['name'], ppdm=ppdm)
+    protection_rule = powerprotect.ProtectionRule(name=module.params['name'], ppdm=ppdm)
     if module.params['state'] == 'absent':
         protection_rule.delete_rule()
     if module.params['state'] == 'present':
-        target_body = {'actionResult': prot_policy_by_name.response['id'],
+        protection_policy = ppdm.get_protection_policy_by_name(module.params['policy_name'])
+        if protection_policy.success is False or not protection_policy.response:
+            module.fail_json(msg=f"invalid protection policy {module.params['policy_name']}", **result)
+        target_body = {'actionResult': protection_policy.response['id'],
                        'name': module.params['name'],
                        'inventorySourceType': module.params['inventory_type'],
                        'conditions': [
@@ -209,12 +136,12 @@ def run_module():
                             'assetAttributeValue': module.params['label']}
                        ]}
         protection_rule.target_body = target_body
-        protection_rule.create_rule(module.params)
-        protection_rule.update_rule(module.params)
+        protection_rule.update_rule()
+        protection_rule.create_rule(**module.params)
     result['changed'] = protection_rule.changed
     if protection_rule.failure is True:
         module.fail_json(msg=protection_rule.fail_msg, **result)
-    result['message'] = protection_policy.msg
+    result['message'] = protection_rule.msg
     module.exit_json(**result)
 
 def main():
