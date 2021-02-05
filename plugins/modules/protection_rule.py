@@ -73,6 +73,82 @@ from ansible.module_utils.basic import AnsibleModule
 import powerprotect
 
 
+class ProtectionPolicy:
+
+    def __init__(self, **kwargs):
+        self.exists = False
+        self.deleted = False
+        self.created = False
+        self.updated = False
+        self.changed = False
+        self.check_mode = kwargs.get('check_mode', False)
+        self.msg = ""
+        self.failure = False
+        self.fail_msg = ""
+        self.name = kwargs['name']
+        self.body = {}
+        self.target_body = {}
+        self.url = ""
+        self.ppdm = kwargs['ppdm']
+        self.get_rule()
+
+    def get_rule(self):
+        protection_rule = self.ppdm.get_protection_rule_by_name(self.name)
+        if bool(protection_rule.response) is not False:
+            self.exists = True
+            self.body = protection_rule.response
+
+    def delete_rule(self):
+        if self.exists:
+            return_value = self.ppdm.delete_protection_rule(self.body['id'])
+            if return_value.success:
+                self.changed = True
+                self.deleted = True
+                self.body = {}
+                self.exists = False
+                self.msg = f"Protection rule {self.name} deleted"
+            elif return_value.success is False:
+                self.failure = True
+                self.fail_msg = return_value.fail_msg
+
+    def create_rule(self, **kwargs):
+        policy_name = kwargs['policy_name']
+        intentory_type = kwargs['intentory_type']
+        label = kwargs['label']
+        if not self.exists:
+            return_value = ppdm.create_protection_rule(rule_name=self.name,
+                                                       policy_name=policy_name,
+                                                       inventory_type=inventory_type,
+                                                       label=label)
+            if return_value.success:
+                self.changed = True
+                self.get_rule()
+                self.created = True
+                self.msg = f"Protection Rule {self.name} created"
+            elif return_value.success is False:
+                self.failure = True
+                self.fail_msg = return_value.fail_msg
+
+    def update_rule(self, **kwargs):
+        policy_name = kwargs['policy_name']
+        intentory_type = kwargs['intentory_type']
+        label = kwargs['label']
+        if (self.exists and
+            self.ppdm.protection_rules_match(self.name, self.target_body) is False):
+            self.body.update(self.target_body)
+            return_value = ppdm.update_protection_rule(self.body)
+            if return_value.success:
+                self.changed = True
+                self.get_rule()
+                self.created = True
+                self.msg = f"Protection Rule {self.name} updated"
+            elif return_value.success is False:
+                self.failure = True
+                self.fail_msg = return_value.fail_msg
+
+
+
+
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
@@ -113,66 +189,33 @@ def run_module():
     if module.check_mode:
         module.exit_json(**result)
 
+    if module.params['name'] == 'fail me':
+        module.fail_json(msg='You requested this to fail', **result)
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
     ppdm = powerprotect.Ppdm(server=module.params['server'],
                              password=module.params['password'])
     ppdm.login()
-    prot_rules = ppdm.get_protection_rule_by_name(module.params['name'])
-    if prot_rules.success is False:
-        module.fail_json(msg='Get protection rules failed', **result)
-    exists = False
-    if bool(prot_rules.response) is True:
-        exists = True
-    if exists and module.params['state'] == 'absent':
-        prid = ppdm.get_protection_rule_by_name(module.params['name'])['id']
-        ansible_body = ppdm.delete_protection_rule(prid)
-        result['changed'] = True
-        result['message'] = f"Protection Rule {module.params['name']} has been deleted"
-        module.exit_json(**result)
-    prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
-    if bool(prot_policy_by_name.response) is False:
-        module.fail_json(msg=f"Invalid protection policy name: {module.params['policy_name']}")
-
-    if not exists and module.params['state'] == 'present':
-        ansible_body = ppdm.create_protection_rule(
-                              policy_name=module.params['policy_name'],
-                              rule_name=module.params['name'],
-                              inventory_type=module.params['inventory_type'],
-                              label=module.params['label'])
-        result['changed'] = True
-    elif exists and module.params['state'] == 'present':
-        prot_policy_by_name = ppdm.get_protection_policy_by_name(module.params['policy_name'])
-        if bool(prot_policy_by_name.response) is False:
-            module.fail_json(msg=f"Invalid protection policy name: {module.params['policy_name']}")
-        ansible_body = {'actionResult': prot_policy_by_name.response['id'],
-                                'name': module.params['name'],
-                                'inventorySourceType': module.params['inventory_type'],
-                        'conditions': [{'assetAttributeName': 'userTags',
-                                        'operator': 'EQUALS',
-                                        'assetAttributeValue': module.params['label']}]
-                                       }
-        if not ppdm.compare_protection_rule(module.params['name'], ansible_body):
-            server_body = ppdm.get_protection_rule_by_name(module.params['name'])
-            server_body.response.update(ansible_body)
-            ppdm.update_protection_rule(server_body)
-            result['changed'] = True
-    #result['original_message'] = ansible_body
-    result['message'] = 'goodbye'
-
-    # use whatever logic you need to determine whether or not this module
-    # made any modifications to your target
-
-    # during the execution of the module, if there is an exception or a
-    # conditional state that effectively causes a failure, run
-    # AnsibleModule.fail_json() to pass in the message and the result
-    if module.params['name'] == 'fail me':
-        module.fail_json(msg='You requested this to fail', **result)
-
-    # in the event of a successful module execution, you will want to
-    # simple AnsibleModule.exit_json(), passing the key/value results
+    protection_rule = ProtectionPolicy(name=module.params['name'], ppdm=ppdm)
+    if module.params['state'] == 'absent':
+        protection_rule.delete_rule()
+    if module.params['state'] == 'present':
+        target_body = {'actionResult': prot_policy_by_name.response['id'],
+                       'name': module.params['name'],
+                       'inventorySourceType': module.params['inventory_type'],
+                       'conditions': [
+                           {'assetAttributeName': 'userTags',
+                            'operator': 'EQUALS',
+                            'assetAttributeValue': module.params['label']}
+                       ]}
+        protection_rule.target_body = target_body
+        protection_rule.create_rule(module.params)
+        protection_rule.update_rule(module.params)
+    result['changed'] = protection_rule.changed
+    if protection_rule.failure is True:
+        module.fail_json(msg=protection_rule.fail_msg, **result)
+    result['message'] = protection_policy.msg
     module.exit_json(**result)
-
 
 def main():
     run_module()
