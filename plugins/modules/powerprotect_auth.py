@@ -76,8 +76,9 @@ import powerprotect
 def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
-        name=dict(type='str', required=True),
-        new=dict(type='bool', required=False, default=False)
+        server=dict(type='str', required=True),
+        password=dict(type='str', required=True),
+        username=dict(type='str', required=False, default='admin')
     )
 
     # seed the result dict in the object
@@ -108,23 +109,18 @@ def run_module():
 
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
-    login = powerprotect.Ppdm(server=
-    result['original_message'] = module.params['name']
-    result['message'] = 'goodbye'
-
-    # use whatever logic you need to determine whether or not this module
-    # made any modifications to your target
-    if module.params['new']:
+    server = powerprotect.Ppdm(server=module.params['server'],
+                              username=module.params['username'],
+                              password=module.params['password'])
+    login = server.login()
+    if login.success is True:
         result['changed'] = True
-
-    # during the execution of the module, if there is an exception or a
-    # conditional state that effectively causes a failure, run
-    # AnsibleModule.fail_json() to pass in the message and the result
-    if module.params['name'] == 'fail me':
-        module.fail_json(msg='You requested this to fail', **result)
-
-    # in the event of a successful module execution, you will want to
-    # simple AnsibleModule.exit_json(), passing the key/value results
+        result['message'] = f"Successfully logged in to {module.params['server']"
+        result['ansible_facts'] = {'access_token': login.response['access_token']}
+        result['auth_response'] = login.response
+    if login.sucess is False:
+        result['auth_response'] = login.fail_msg
+        module.fail_json(msg="Failed to login", **result)
     module.exit_json(**result)
 
 

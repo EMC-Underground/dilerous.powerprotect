@@ -1,9 +1,9 @@
 ---
 protection_rules:
-- name: 'rule1'
+- name: 'Alisha'
   policy_name: 'daily'
   inventory_type: 'KUBERNETES'
-  label: 'test=test'
+  label: 'test=Alisha'
   state: 'present'
   check_mode: true
 - name: 'rule2'
