@@ -3,7 +3,7 @@
   dilerous.powerprotect.protection_rule:
     name: "{{ item.name }}"
     policy_name: "{{ item.policy_name | default('') }}"
-    inventory_type: "{{ item.inventory_type }}"
+    inventory_type: "{{ item.inventory_type | default(inventory_type) }}"
     label: "{{ item.label | default('') }}"
     state: "{{ item.state }}"
     token: "{{ ansible_facts['access_token'] }}"

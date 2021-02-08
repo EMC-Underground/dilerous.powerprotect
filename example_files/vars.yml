@@ -1,17 +1,19 @@
 ---
 protection_rules:
-- name: 'Alisha'
-  policy_name: 'daily'
-  inventory_type: 'KUBERNETES'
-  label: 'test=Alisha'
-  state: 'present'
-- name: 'rule2'
-  policy_name: 'daily'
-  inventory_type: 'KUBERNETES'
-  label: 'backup=testtt'
-  state: 'absent'
-- name: 'Denise'
-  policy_name: 'daily'
-  inventory_type: 'KUBERNETES'
-  label: 'backup=denise'
+- name: Alisha
+  policy_name: daily
+  inventory_type: KUBERNETES
+  label: test=Alisha
+  state: absent
+- name: rule2
+  policy_name: daily
+  inventory_type: KUBERNETES
+  label: backup=testtt
+  state: absent
+- name: Denise
+  policy_name: daily
+  inventory_type: KUBERNETES
+  label: backup=denise
+  state: absent
+- name: rule1
   state: absent
