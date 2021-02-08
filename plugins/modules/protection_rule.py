@@ -81,9 +81,7 @@ def run_module():
         label=dict(type='str'),
         priority=dict(type='str'),
         server=dict(type='str', required=True),
-        password=dict(type='str', no_log=True, required=True),
-        username=dict(type='str', default='admin'),
-        token=dict(type='str'),
+        token=dict(type='str', required=True),
         state=dict(default='present', choices=['present', 'absent'])
     )
 
@@ -99,10 +97,8 @@ def run_module():
         supports_check_mode=True
     )
 
-    ppdm = powerprotect.Ppdm(server=module.params['server'],
-                             password=module.params['password'],
-                             username=module.params['username'])
-    ppdm.login()
+    ppdm = powerprotect.Ppdm(token=module.params['token'],
+                             server=module.params['server'])
     protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
                                                   ppdm=ppdm,
                                                   check_mode=module.check_mode)

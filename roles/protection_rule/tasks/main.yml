@@ -1,13 +1,18 @@
 ---
-# tasks file for protection_rule
-- name: run the new module
+- name: Login to PowerProtect
+  dilerous.powerprotect.powerprotect_auth:
+    server: "{{ inventory_hostname }}"
+    password: "{{ password }}"
+    username: "{{ username }}"
+- name: Create, Update and Delete Protection Rules
   dilerous.powerprotect.protection_rule:
-    server: "{{ inventory_hostname | default('') }}"
-    password: "{{ password | default('') }}"
     name: "{{ item.name }}"
     policy_name: "{{ item.policy_name | default('') }}"
-    inventory_type: "{{ item.inventory_type | default('KUBERNETES') }}"
+    inventory_type: "{{ item.inventory_type }}"
     label: "{{ item.label | default('') }}"
-    state: "{{ item.state | default('present') }}"
-    token: "{{ item.token | default('') }}"
+    state: "{{ item.state }}"
+    token: "{{ ansible_facts['access_token'] }}"
+    server: "{{ inventory_hostname }}"
   loop: "{{ protection_rules }}"
+  loop_control:
+    label: "{{ item.name }}"

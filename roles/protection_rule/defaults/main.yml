@@ -1,2 +1,5 @@
 ---
 # defaults file for protection_rule
+username: admin
+state: present
+inventory_type: KUBERNETES
