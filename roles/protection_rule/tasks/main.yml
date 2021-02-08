@@ -5,7 +5,7 @@
     policy_name: "{{ item.policy_name | default('') }}"
     inventory_type: "{{ item.inventory_type | default(inventory_type) }}"
     label: "{{ item.label | default('') }}"
-    state: "{{ item.state }}"
+    state: "{{ item.state | default(state) }}"
     token: "{{ ansible_facts['access_token'] }}"
     server: "{{ inventory_hostname }}"
   loop: "{{ protection_rules }}"
