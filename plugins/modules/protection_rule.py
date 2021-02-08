@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 # Copyright: (c) 2018, Terry Jones <terry.jones@example.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -56,7 +57,8 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-# These are examples of possible return values, and in general should use other names for return values.
+# These are examples of possible return values, and in general should use
+other names for return values.
 original_message:
     description: The original name param that was passed in.
     type: str
@@ -77,11 +79,14 @@ def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
         policy_name=dict(type='str'),
-        inventory_type=dict(default='KUBERNETES', choices=['KUBERNETES', 'VMWARE_VIRTUAL_MACHINE']),
+        inventory_type=dict(default='KUBERNETES',
+                            choices=['KUBERNETES', 'VMWARE_VIRTUAL_MACHINE']),
         label=dict(type='str'),
         priority=dict(type='str'),
         server=dict(type='str', required=True),
-        token=dict(type='str', required=True),
+        token=dict(type='str'),
+        username=dict(type='str'),
+        password=dict(type='str', no_log=True),
         state=dict(default='present', choices=['present', 'absent'])
     )
 
@@ -97,17 +102,21 @@ def run_module():
         supports_check_mode=True
     )
 
-    protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
-                                                  token=module.params['token'],
-                                                  server=module.params['server'],
-                                                  check_mode=module.check_mode)
+    protection_rule = powerprotect.ProtectionRule(
+        name=module.params['name'],
+        token=module.params['token'],
+        server=module.params['server'],
+        check_mode=module.check_mode)
     print(module.check_mode)
     if module.params['state'] == 'absent':
         protection_rule.delete_rule()
     if module.params['state'] == 'present':
-        protection_policy = ppdm.get_protection_policy_by_name(module.params['policy_name'])
-        if protection_policy.success is False or not protection_policy.response:
-            module.fail_json(msg=f"invalid protection policy {module.params['policy_name']}", **result)
+        protection_policy = protection_rule.get_protection_policy_by_name(
+            module.params['policy_name'])
+        if (protection_policy.success is False
+                or not protection_policy.response):
+            module.fail_json(msg="invalid protection policy "
+                             f"{module.params['policy_name']}", **result)
         target_body = {'actionResult': protection_policy.response['id'],
                        'name': module.params['name'],
                        'inventorySourceType': module.params['inventory_type'],
@@ -125,6 +134,7 @@ def run_module():
         module.fail_json(msg=protection_rule.fail_msg, **result)
     result['message'] = protection_rule.msg
     module.exit_json(**result)
+
 
 def main():
     run_module()
