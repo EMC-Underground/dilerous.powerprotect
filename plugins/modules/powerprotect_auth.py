@@ -77,7 +77,7 @@ def run_module():
     # define available arguments/parameters a user can pass to the module
     module_args = dict(
         server=dict(type='str', required=True),
-        password=dict(type='str', required=True),
+        password=dict(type='str', required=True, no_log=True),
         username=dict(type='str', required=False, default='admin')
     )
 
