@@ -1,0 +1,6 @@
+---
+- name: Login to PowerProtect
+  dilerous.powerprotect.auth:
+    server: "{{ inventory_hostname }}"
+    password: "{{ password }}"
+    username: "{{ username }}"

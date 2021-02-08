@@ -1,9 +1,4 @@
 ---
-- name: Login to PowerProtect
-  dilerous.powerprotect.powerprotect_auth:
-    server: "{{ inventory_hostname }}"
-    password: "{{ password }}"
-    username: "{{ username }}"
 - name: Create, Update and Delete Protection Rules
   dilerous.powerprotect.protection_rule:
     name: "{{ item.name }}"
@@ -15,4 +10,4 @@
     server: "{{ inventory_hostname }}"
   loop: "{{ protection_rules }}"
   loop_control:
-    label: "{{ item.name }}"
+    label: "Rule: {{ item.name }}"
