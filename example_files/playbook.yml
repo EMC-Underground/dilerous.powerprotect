@@ -3,4 +3,5 @@
   vars_files:
   - ./vars.yml
   roles:
+  - dilerous.powerprotect.powerprotect_auth
   - dilerous.powerprotect.protection_rule
