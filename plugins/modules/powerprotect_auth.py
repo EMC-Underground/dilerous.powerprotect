@@ -115,7 +115,7 @@ def run_module():
     login = server.login()
     if login.success is True:
         result['changed'] = True
-        result['message'] = f"Successfully logged in to {module.params['server']"
+        result['message'] = f"Successfully logged in to {module.params['server']}"
         result['ansible_facts'] = {'access_token': login.response['access_token']}
         result['auth_response'] = login.response
     if login.sucess is False:
@@ -130,5 +130,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
