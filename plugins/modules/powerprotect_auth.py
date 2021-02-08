@@ -118,7 +118,7 @@ def run_module():
         result['message'] = f"Successfully logged in to {module.params['server']}"
         result['ansible_facts'] = {'access_token': login.response['access_token']}
         result['auth_response'] = login.response
-    if login.sucess is False:
+    if login.success is False:
         result['auth_response'] = login.fail_msg
         module.fail_json(msg="Failed to login", **result)
     module.exit_json(**result)
