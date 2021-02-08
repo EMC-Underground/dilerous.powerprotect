@@ -1,5 +1,6 @@
 ---
 - hosts: prodiad
+  gather_facts: no
   vars_files:
   - ./vars.yml
   roles:

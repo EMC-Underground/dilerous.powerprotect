@@ -114,7 +114,6 @@ def run_module():
                               password=module.params['password'])
     login = server.login()
     if login.success is True:
-        result['changed'] = True
         result['message'] = f"Successfully logged in to {module.params['server']}"
         result['ansible_facts'] = {'access_token': login.response['access_token']}
         result['auth_response'] = login.response
