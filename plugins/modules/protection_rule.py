@@ -97,10 +97,9 @@ def run_module():
         supports_check_mode=True
     )
 
-    ppdm = powerprotect.Ppdm(token=module.params['token'],
-                             server=module.params['server'])
     protection_rule = powerprotect.ProtectionRule(name=module.params['name'],
-                                                  ppdm=ppdm,
+                                                  token=module.params['token'],
+                                                  server=module.params['server'],
                                                   check_mode=module.check_mode)
     print(module.check_mode)
     if module.params['state'] == 'absent':

@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 # Copyright: (c) 2018, Terry Jones <terry.jones@example.org>
-# GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
+# GNU General Public License v3.0+ (see COPYING or
+# https://www.gnu.org/licenses/gpl-3.0.txt)
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
@@ -56,7 +57,8 @@ EXAMPLES = r'''
 '''
 
 RETURN = r'''
-# These are examples of possible return values, and in general should use other names for return values.
+# These are examples of possible return values, and in general should use
+other names for return values.
 original_message:
     description: The original name param that was passed in.
     type: str
@@ -110,12 +112,14 @@ def run_module():
     # manipulate or modify the state as needed (this is going to be the
     # part where your module will do what it needs to do)
     server = powerprotect.Ppdm(server=module.params['server'],
-                              username=module.params['username'],
-                              password=module.params['password'])
+                               username=module.params['username'],
+                               password=module.params['password'])
     login = server.login()
     if login.success is True:
-        result['message'] = f"Successfully logged in to {module.params['server']}"
-        result['ansible_facts'] = {'access_token': login.response['access_token']}
+        result['message'] = "Successfully logged in to " \
+            f"{module.params['server']}"
+        result['ansible_facts'] = {'access_token': login.
+                                   response['access_token']}
         result['auth_response'] = login.response
     if login.success is False:
         result['auth_response'] = login.fail_msg
