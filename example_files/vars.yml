@@ -3,7 +3,7 @@ protection_rules:
 - name: Alisha
   policy_name: daily
   inventory_type: KUBERNETES
-  label: test=Alisha
+  label: Craig=Alisha
   state: absent
 - name: rule2
   policy_name: daily
