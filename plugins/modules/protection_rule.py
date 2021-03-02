@@ -130,7 +130,7 @@ def run_module():
     if protection_rule.failure is True:
         module.fail_json(msg=protection_rule.fail_msg,
                          response=protection_rule.fail_response,
-                         body=protection_rule.fail_body,
+                         request_body=protection_rule.fail_body,
                          **result)
     result['changed'] = protection_rule.changed
     result['protection_rule'] = protection_rule.body
