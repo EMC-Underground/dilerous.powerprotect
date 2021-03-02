@@ -113,9 +113,8 @@ def run_module():
     if module.params['state'] == 'present':
         protection_policy = protection_rule.get_protection_policy_by_name(
             module.params['policy_name'])
-        if (protection_policy.success is False
-                or not protection_policy.response):
-            module.fail_json(msg="invalid protection policy "
+        if not protection_policy.response:
+            module.fail_json(msg="invalid protection policy: "
                              f"{module.params['policy_name']}", **result)
         target_body = {'actionResult': protection_policy.response['id'],
                        'name': module.params['name'],
