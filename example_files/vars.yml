@@ -6,10 +6,10 @@ protection_rules:
   label: Craig=Alish
   state: present
 - name: rule2
-  policy_name: daily
+  policy_name: test
   inventory_type: KUBERNETES
   label: backup=testtt
-  state: absent
+  state: present
 - name: Denise
   policy_name: daily
   inventory_type: KUBERNETES
