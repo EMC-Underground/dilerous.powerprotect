@@ -128,7 +128,9 @@ def run_module():
         protection_rule.update_rule()
         protection_rule.create_rule(**module.params)
     if protection_rule.failure is True:
-        module.fail_json(msg=protection_rule.fail_msg, **result)
+        module.fail_json(msg=protection_rule.fail_msg,
+                         response=protection_rule.fail_response,
+                         **result)
     result['changed'] = protection_rule.changed
     result['protection_rule'] = protection_rule.body
     result['message'] = protection_rule.msg
