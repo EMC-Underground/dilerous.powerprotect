@@ -10,4 +10,4 @@
     server: "{{ inventory_hostname }}"
   loop: "{{ protection_rules }}"
   loop_control:
-    label: "Rule: {{ item.name }} | State: {{ item.state }}"
+    label: "Rule: {{ item.name }} | State: {{ item.state | default(state) }}"

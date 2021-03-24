@@ -81,7 +81,7 @@ def run_module():
         username=dict(type='str'),
         cred_type=dict(default='KUBERNETES',
                              choices=['KUBERNETES', 'VCENTER']),
-        password=dict(type='str'),
+        password=dict(type='str', no_log=True),
         method=dict(type='str'),
         server=dict(type='str', required=True),
         token=dict(type='str'),
