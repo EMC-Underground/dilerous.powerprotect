@@ -4,7 +4,7 @@ protection_rules:
   policy_name: test
   inventory_type: KUBERNETES
   label: Craig=Alish
-  state: present
+  state: absent
 - name: rule2
   policy_name: test
   inventory_type: KUBERNETES
@@ -17,3 +17,7 @@ protection_rules:
   state: absent
 - name: rule1
   state: absent
+credentials:
+- name: brad
+  password: tokenthingy
+  state: present
