@@ -7,4 +7,5 @@
   - dilerous.powerprotect
   roles:
   - role: auth
+  - role: credential
   - role: protection_rule

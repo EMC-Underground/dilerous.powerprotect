@@ -79,7 +79,7 @@ def run_module():
     module_args = dict(
         name=dict(type='str', required=True),
         username=dict(type='str'),
-        credential_type=dict(default='KUBERNETES',
+        cred_type=dict(default='KUBERNETES',
                              choices=['KUBERNETES', 'VCENTER']),
         password=dict(type='str'),
         method=dict(type='str'),
@@ -112,7 +112,7 @@ def run_module():
                        'name': module.params['name'],
                        'method': module.params['method'],
                        'password': module.params['password'],
-                       'type': module.params['credential_type']
+                       'type': module.params['cred_type']
                        }
         credential.target_body = target_body
         credential.update_credential()
