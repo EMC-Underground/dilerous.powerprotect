@@ -20,4 +20,6 @@ protection_rules:
 credentials:
 - name: brad
   password: tokenthingy
-  state: present
+  state: absent
+- name: aaron
+  password: thisisadifferenttoken
