@@ -119,7 +119,6 @@ def run_module():
         target_body = {'actionResult': protection_policy.response['id'],
                        'name': module.params['name'],
                        'inventorySourceType': module.params['inventory_type'],
-                       'logicalOperator': 'AND',
                        'conditions': [
                            {'assetAttributeName': 'userTags',
                             'operator': 'EQUALS',
